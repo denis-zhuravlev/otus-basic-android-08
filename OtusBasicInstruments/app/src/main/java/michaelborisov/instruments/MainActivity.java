@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private FusedLocationProviderClient fusedLocationClient;
 
+    private int counter = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getLastLocation();
+                startLocationUpdates();
             }
         });
 
@@ -48,14 +50,28 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 MY_PERMISSIONS_REQUEST_FINE_LOCATION);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-
-        }
 
         fusedLocationClient = LocationServices
                 .getFusedLocationProviderClient(this);
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if(counter >= 3) {
+                    stopLocationUpdates();
+                    return;
+                }
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    System.out.println(location.getLatitude());
 
+                }
+                counter++;
+            }
+
+            ;
+        };
 
 
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
@@ -71,6 +87,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    private void startLocationUpdates() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper());
+        }
+
+
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback);
+    }
     private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 5;
 
     public void getLastLocation() {
@@ -84,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
                             if (location != null) {
                                 System.out.println(location.getLatitude());
 
+                            } else {
+                                startLocationUpdates();
                             }
                         }
                     });
