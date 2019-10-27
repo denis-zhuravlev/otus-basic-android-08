@@ -1,6 +1,5 @@
 package michaelborisov.androidcomponents;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -31,8 +30,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                sendBroadcast(new Intent("MY_ACTION"),
-                        Manifest.permission.SEND_SMS);
+//                sendBroadcast(new Intent("MY_ACTION"),
+//                        Manifest.permission.SEND_SMS);
+
+                Intent intent = new Intent("otus.BroadcastReceivers");
+                sendOrderedBroadcast(intent, null);
 
             }
         });
