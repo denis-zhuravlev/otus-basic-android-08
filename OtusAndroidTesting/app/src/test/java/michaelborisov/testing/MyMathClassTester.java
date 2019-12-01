@@ -1,17 +1,19 @@
 package michaelborisov.testing;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class MyMathClassTester {
 
-    private MyMathClass myMathClass;
+    private static MyMathClass myMathClass;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         myMathClass = new MyMathClass();
     }
 
@@ -21,8 +23,17 @@ public class MyMathClassTester {
         assertEquals(4, myMathClass.sum(2, 2));
     }
 
-    @After
-    public void tearDown() {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void isDevisionCorrect() {
+
+        //assertEquals(4, myMathClass.sum(2, 2));
+        assertEquals(0, myMathClass.devise(4, 0));
+    }
+
+
+    @AfterClass
+    public static void tearDown() {
         myMathClass = null;
     }
 }
