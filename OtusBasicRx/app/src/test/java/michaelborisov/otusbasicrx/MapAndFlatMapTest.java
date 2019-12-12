@@ -2,9 +2,15 @@ package michaelborisov.otusbasicrx;
 
 import org.junit.Test;
 
+import java.util.Random;
+import java.util.concurrent.Callable;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.SingleSource;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -75,5 +81,43 @@ public class MapAndFlatMapTest {
                 System.out.println("Received: " + integer.toString());
             }
         });
+    }
+
+    @Test
+    public void flatMapSingleTest() throws InterruptedException {
+        Single.fromCallable(() -> new Random().nextInt(10))
+                .flatMap((Function<Integer, SingleSource<Integer>>) integer -> (SingleSource<Integer>) observer -> {
+                    if (integer < 5) {
+                        observer.onSuccess(4);
+                        //observer.onError(new IllegalArgumentException("Something went wrong"));
+                    } else {
+                        observer.onSuccess(6);
+                    }
+                }).flatMap((Function<Integer, SingleSource<Integer>>) o -> (SingleSource<Integer>) observer -> {
+                    if (o == 4) {
+                        observer.onSuccess(3);
+                    } else {
+                        observer.onSuccess(7);
+                    }
+                }).subscribe(new SingleObserver<Integer>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onSuccess(Integer integer) {
+                System.out.println(integer);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                System.out.println("Caught exception");
+                e.printStackTrace();
+            }
+        });
+
+        Thread.sleep(3000);
+
     }
 }
