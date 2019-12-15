@@ -20,6 +20,8 @@ public class ElectricHeater {
     public void assemble() {
         if (mCord != null && mCorpus != null) {
             System.out.println("Assembled correctly");
+            System.out.println("Cord: " + mCord.getLength());
+            System.out.println("Corpus: " + mCorpus.getMaterial());
             return;
         }
         throw new IllegalArgumentException("Parts of the heater are null");
